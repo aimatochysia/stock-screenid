@@ -1,0 +1,111 @@
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# Dependency directories
+node_modules/
+
+# Build output
+dist/
+dist-ssr/
+out/
+
+# Vite
+.vite/
+
+# Env files
+.env
+.env.*.local
+*.local
+
+# Editor configs
+.vscode/*
+!.vscode/extensions.json
+
+# JetBrains IDEs (WebStorm, PhpStorm, etc.)
+.idea/
+
+# macOS
+.DS_Store
+
+# Windows
+Thumbs.db
+ehthumbs.db
+*.lnk
+
+# Linux
+*~
+
+# Coverage
+coverage/
+.nyc_output/
+*.lcov
+
+# Optional npm cache directory
+.npm/
+
+# Optional eslint / stylelint / prettier caches
+.eslintcache
+.stylelintcache
+.prettier-cache
+
+# TypeScript
+*.tsbuildinfo
+
+# Parcel
+.cache/
+
+# VS Code workspace history
+.history/
+
+# Backup/editor temp files
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# Tailwind CSS JIT temp files
+.tailwindcss*
+
+# Firebase
+.firebase/
+
+# React Native
+.expo/
+.expo-shared/
+
+# Remix
+.build/
+
+# SvelteKit
+.svelte-kit/
+
+# Next.js
+.next/
+
+# Netlify
+.netlify/
+
+# Storybook
+.storybook-out/
+storybook-static/
+
+# Playwright/Cypress
+.playwright/
+cypress/screenshots/
+cypress/videos/
+
+# Docker 
+docker-compose.override.yml
+
+# Backend runtime data
+*.sqlite
+*.db
+uploads/
+logs/
