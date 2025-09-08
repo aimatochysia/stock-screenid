@@ -2,16 +2,6 @@ import React, { useEffect, useMemo, useRef, useState } from "react";
 import { BrowserRouter, Routes, Route, Link, useNavigate, useParams } from "react-router-dom";
 import { createChart, LineStyle } from "lightweight-charts";
 
-/**
- * Single-file React app
- * - Screener page: loads latest technicals, caches 12h, sortable table (default sort by volume), search + filters, neat UI
- * - Stock viewer: loads L&C + Daily from db hinted in latest, caches 12h
- * - Interactive candlestick + bottom volume, zoom/pan, bar width control, toggleable dotted latest levels, toggleable channel lines
- *
- * Dependencies to install in your project:
- *   npm i react-router-dom lightweight-charts
- * (optional but used for styling) Tailwind CSS classes are included; they render fine as plain classNames if you haven't set up Tailwind yet.
- */
 
 const HOUR = 60 * 60 * 1000;
 const TTL_MS = 12 * HOUR;
