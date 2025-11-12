@@ -1,8 +1,10 @@
 import React, { useMemo } from 'react';
+import { useTheme } from '../contexts/ThemeContext';
 
 // StockHeatmap: displays stocks as colored boxes based on performance
 // Size represents market cap, color represents price change percentage
 export default function StockHeatmap({ data = [], metric = 'priceVsSMA50Pct' }) {
+  const { isDark } = useTheme();
   const processedData = useMemo(() => {
     if (!data || data.length === 0) return [];
     
@@ -29,19 +31,44 @@ export default function StockHeatmap({ data = [], metric = 'priceVsSMA50Pct' }) 
   }, [processedData, metric]);
 
   const getColor = (value) => {
-    if (value == null) return 'bg-gray-200';
+    if (value == null) return isDark ? 'rgb(55, 65, 81)' : 'rgb(229, 231, 235)';
     
     // Normalize value between -1 and 1
-    const normalized = Math.max(-1, Math.min(1, value / Math.max(Math.abs(minValue), Math.abs(maxValue))));
+    const maxAbs = Math.max(Math.abs(minValue), Math.abs(maxValue));
+    const normalized = Math.max(-1, Math.min(1, value / (maxAbs || 1)));
     
     if (normalized > 0) {
-      // Green for positive
-      const intensity = Math.floor(normalized * 255);
-      return `rgb(${255 - intensity}, 255, ${255 - intensity})`;
+      // Green shades for positive - improved gradient
+      const intensity = Math.abs(normalized);
+      if (isDark) {
+        // Dark mode: deeper greens
+        const r = Math.floor(0 + (34 * (1 - intensity)));
+        const g = Math.floor(100 + (155 * intensity));
+        const b = Math.floor(0 + (34 * (1 - intensity)));
+        return `rgb(${r}, ${g}, ${b})`;
+      } else {
+        // Light mode: brighter greens
+        const r = Math.floor(220 - (120 * intensity));
+        const g = Math.floor(255);
+        const b = Math.floor(220 - (120 * intensity));
+        return `rgb(${r}, ${g}, ${b})`;
+      }
     } else {
-      // Red for negative
-      const intensity = Math.floor(Math.abs(normalized) * 255);
-      return `rgb(255, ${255 - intensity}, ${255 - intensity})`;
+      // Red shades for negative - improved gradient
+      const intensity = Math.abs(normalized);
+      if (isDark) {
+        // Dark mode: deeper reds
+        const r = Math.floor(139 + (116 * intensity));
+        const g = Math.floor(0 + (34 * (1 - intensity)));
+        const b = Math.floor(0 + (34 * (1 - intensity)));
+        return `rgb(${r}, ${g}, ${b})`;
+      } else {
+        // Light mode: brighter reds
+        const r = Math.floor(255);
+        const g = Math.floor(220 - (120 * intensity));
+        const b = Math.floor(220 - (120 * intensity));
+        return `rgb(${r}, ${g}, ${b})`;
+      }
     }
   };
 
@@ -57,17 +84,17 @@ export default function StockHeatmap({ data = [], metric = 'priceVsSMA50Pct' }) 
 
   if (processedData.length === 0) {
     return (
-      <div className="p-8 text-center text-gray-500 bg-gray-50 rounded-lg">
+      <div className={`p-8 text-center rounded-lg ${isDark ? 'bg-gray-800 text-gray-400' : 'bg-gray-50 text-gray-500'}`}>
         No data available for heat map
       </div>
     );
   }
 
   return (
-    <div className="bg-white rounded-lg border p-4">
+    <div className={`rounded-lg border p-4 transition-colors duration-300 ${isDark ? 'bg-gray-800/50 border-gray-700' : 'bg-white border-gray-200'}`}>
       <div className="mb-4">
-        <h3 className="text-lg font-semibold mb-2">Stock Performance Heat Map</h3>
-        <div className="flex items-center gap-4 text-sm text-gray-600">
+        <h3 className={`text-lg font-semibold mb-2 ${isDark ? 'text-gray-200' : 'text-gray-800'}`}>Stock Performance Heat Map</h3>
+        <div className={`flex items-center gap-4 text-sm ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
           <div className="flex items-center gap-2">
             <span>Color: {metric === 'priceVsSMA50Pct' ? 'Price vs SMA50' : metric} (%)</span>
           </div>
@@ -76,18 +103,18 @@ export default function StockHeatmap({ data = [], metric = 'priceVsSMA50Pct' }) 
           </div>
         </div>
         <div className="flex items-center gap-2 mt-2 text-xs">
-          <span className="text-gray-600">Legend:</span>
+          <span className={isDark ? 'text-gray-400' : 'text-gray-600'}>Legend:</span>
           <div className="flex items-center gap-1">
-            <div className="w-4 h-4 rounded" style={{ backgroundColor: 'rgb(255, 100, 100)' }}></div>
-            <span>Negative</span>
+            <div className="w-4 h-4 rounded" style={{ backgroundColor: isDark ? 'rgb(255, 100, 100)' : 'rgb(255, 150, 150)' }}></div>
+            <span className={isDark ? 'text-gray-400' : 'text-gray-700'}>Negative</span>
           </div>
           <div className="flex items-center gap-1">
-            <div className="w-4 h-4 rounded bg-gray-200"></div>
-            <span>Neutral</span>
+            <div className={`w-4 h-4 rounded ${isDark ? 'bg-gray-700' : 'bg-gray-200'}`}></div>
+            <span className={isDark ? 'text-gray-400' : 'text-gray-700'}>Neutral</span>
           </div>
           <div className="flex items-center gap-1">
-            <div className="w-4 h-4 rounded" style={{ backgroundColor: 'rgb(100, 255, 100)' }}></div>
-            <span>Positive</span>
+            <div className="w-4 h-4 rounded" style={{ backgroundColor: isDark ? 'rgb(100, 255, 100)' : 'rgb(150, 255, 150)' }}></div>
+            <span className={isDark ? 'text-gray-400' : 'text-gray-700'}>Positive</span>
           </div>
         </div>
       </div>
@@ -101,7 +128,7 @@ export default function StockHeatmap({ data = [], metric = 'priceVsSMA50Pct' }) 
           return (
             <div
               key={stock.symbol}
-              className="relative group cursor-pointer transition-transform hover:scale-105 hover:z-10 rounded shadow-sm"
+              className="relative group cursor-pointer transition-all duration-300 hover:scale-110 hover:z-10 rounded-lg shadow-md hover:shadow-2xl"
               style={{
                 width: `${size}px`,
                 height: `${size}px`,
@@ -112,22 +139,28 @@ export default function StockHeatmap({ data = [], metric = 'priceVsSMA50Pct' }) 
               title={`${stock.symbol}: ${value?.toFixed(2)}%`}
             >
               <div className="absolute inset-0 flex flex-col items-center justify-center p-1">
-                <span className="font-bold text-xs text-gray-800 break-all text-center leading-tight">
+                <span className={`font-bold text-xs break-all text-center leading-tight ${isDark ? 'text-white' : 'text-gray-900'}`}>
                   {stock.symbol}
                 </span>
-                <span className="text-xs font-semibold text-gray-700 mt-0.5">
+                <span className={`text-xs font-semibold mt-0.5 ${isDark ? 'text-gray-200' : 'text-gray-800'}`}>
                   {value?.toFixed(1)}%
                 </span>
               </div>
               
               {/* Tooltip on hover */}
-              <div className="absolute hidden group-hover:block z-20 bg-gray-900 text-white text-xs rounded p-2 -top-24 left-1/2 transform -translate-x-1/2 w-48 shadow-lg">
-                <div className="font-bold mb-1">{stock.symbol}</div>
-                <div>Close: ${stock.close?.toFixed(2)}</div>
-                <div>Market Cap: {formatMarketCap(stock.marketCap)}</div>
-                <div>{metric}: {value?.toFixed(2)}%</div>
-                <div>Stage: {stock.marketStage || 'N/A'}</div>
-                <div className="absolute w-2 h-2 bg-gray-900 transform rotate-45 -bottom-1 left-1/2 -translate-x-1/2"></div>
+              <div className={`absolute hidden group-hover:block z-20 text-xs rounded-lg p-3 -top-28 left-1/2 transform -translate-x-1/2 w-52 shadow-2xl border ${
+                isDark ? 'bg-gray-900 text-white border-gray-700' : 'bg-white text-gray-900 border-gray-300'
+              }`}>
+                <div className="font-bold mb-2 text-sm">{stock.symbol}</div>
+                <div className="space-y-1">
+                  <div>Close: ${stock.close?.toFixed(2)}</div>
+                  <div>Market Cap: {formatMarketCap(stock.marketCap)}</div>
+                  <div>{metric}: {value?.toFixed(2)}%</div>
+                  <div>Stage: {stock.marketStage || 'N/A'}</div>
+                </div>
+                <div className={`absolute w-3 h-3 transform rotate-45 -bottom-1.5 left-1/2 -translate-x-1/2 ${
+                  isDark ? 'bg-gray-900 border-r border-b border-gray-700' : 'bg-white border-r border-b border-gray-300'
+                }`}></div>
               </div>
             </div>
           );
