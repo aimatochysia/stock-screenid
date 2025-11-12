@@ -9,7 +9,7 @@
   transition-duration: 200ms;
 }
 
-/* Disable transitions for elements that shouldn't animate */
+/* Add specific transitions for interactive elements */
 input, textarea, select, button {
   transition-property: background-color, border-color, color, transform, box-shadow;
 }
