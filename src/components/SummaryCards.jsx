@@ -1,6 +1,8 @@
 import React, { useMemo } from 'react';
+import { useTheme } from '../contexts/ThemeContext';
 
 export default function SummaryCards({ data = [] }) {
+  const { isDark } = useTheme();
   const stats = useMemo(() => {
     if (!data || data.length === 0) return null;
     
@@ -44,30 +46,38 @@ export default function SummaryCards({ data = [] }) {
       title: 'Total Stocks',
       value: stats.totalStocks,
       icon: '📊',
-      color: 'bg-blue-50 border-blue-200',
-      textColor: 'text-blue-700'
+      color: isDark ? 'bg-blue-900/30 border-blue-700' : 'bg-blue-50 border-blue-200',
+      textColor: isDark ? 'text-blue-400' : 'text-blue-700'
     },
     {
       title: 'Gainers / Losers',
       value: `${stats.gainers} / ${stats.losers}`,
       icon: '📈',
-      color: 'bg-green-50 border-green-200',
-      textColor: 'text-green-700',
+      color: isDark ? 'bg-green-900/30 border-green-700' : 'bg-green-50 border-green-200',
+      textColor: isDark ? 'text-green-400' : 'text-green-700',
       subtitle: `${((stats.gainers / (stats.gainers + stats.losers || 1)) * 100).toFixed(0)}% positive`
     },
     {
       title: 'Total Market Cap',
       value: formatMarketCap(stats.totalMarketCap),
       icon: '💰',
-      color: 'bg-purple-50 border-purple-200',
-      textColor: 'text-purple-700'
+      color: isDark ? 'bg-purple-900/30 border-purple-700' : 'bg-purple-50 border-purple-200',
+      textColor: isDark ? 'text-purple-400' : 'text-purple-700'
     },
     {
       title: 'Avg RSI (14)',
       value: stats.avgRSI.toFixed(1),
       icon: '📉',
-      color: stats.avgRSI > 70 ? 'bg-red-50 border-red-200' : stats.avgRSI < 30 ? 'bg-yellow-50 border-yellow-200' : 'bg-gray-50 border-gray-200',
-      textColor: stats.avgRSI > 70 ? 'text-red-700' : stats.avgRSI < 30 ? 'text-yellow-700' : 'text-gray-700',
+      color: stats.avgRSI > 70 
+        ? (isDark ? 'bg-red-900/30 border-red-700' : 'bg-red-50 border-red-200')
+        : stats.avgRSI < 30 
+          ? (isDark ? 'bg-yellow-900/30 border-yellow-700' : 'bg-yellow-50 border-yellow-200')
+          : (isDark ? 'bg-gray-800 border-gray-700' : 'bg-gray-50 border-gray-200'),
+      textColor: stats.avgRSI > 70 
+        ? (isDark ? 'text-red-400' : 'text-red-700')
+        : stats.avgRSI < 30 
+          ? (isDark ? 'text-yellow-400' : 'text-yellow-700')
+          : (isDark ? 'text-gray-400' : 'text-gray-700'),
       subtitle: `${stats.overbought} overbought, ${stats.oversold} oversold`
     }
   ];
@@ -77,14 +87,14 @@ export default function SummaryCards({ data = [] }) {
       {cards.map((card, idx) => (
         <div
           key={idx}
-          className={`${card.color} border rounded-lg p-4 shadow-sm hover:shadow-md transition-shadow`}
+          className={`${card.color} border rounded-lg p-4 shadow-sm hover:shadow-md transition-all duration-300 transform hover:scale-105`}
         >
           <div className="flex items-start justify-between">
             <div className="flex-1">
-              <p className="text-sm font-medium text-gray-600 mb-1">{card.title}</p>
+              <p className={`text-sm font-medium mb-1 ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>{card.title}</p>
               <p className={`text-2xl font-bold ${card.textColor}`}>{card.value}</p>
               {card.subtitle && (
-                <p className="text-xs text-gray-500 mt-1">{card.subtitle}</p>
+                <p className="text-gray-500 text-xs mt-1">{card.subtitle}</p>
               )}
             </div>
             <div className="text-3xl ml-2">{card.icon}</div>
