@@ -94,7 +94,7 @@ export default function SummaryCards({ data = [] }) {
               <p className={`text-sm font-medium mb-1 ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>{card.title}</p>
               <p className={`text-2xl font-bold ${card.textColor}`}>{card.value}</p>
               {card.subtitle && (
-                <p className={`text-xs mt-1 ${isDark ? 'text-gray-500' : 'text-gray-500'}`}>{card.subtitle}</p>
+                <p className="text-gray-500 text-xs mt-1">{card.subtitle}</p>
               )}
             </div>
             <div className="text-3xl ml-2">{card.icon}</div>
