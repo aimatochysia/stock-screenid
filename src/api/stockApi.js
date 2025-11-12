@@ -1,10 +1,13 @@
 // src/api/stockApi.js
 // Cache TTL = 12 hours. Exposes getStockData({force}) and clearStockCache()
 
+import { mockStockData } from './mockData';
+
 const INFO_URL = 'https://stock-results.vercel.app/api/info';
 const TECH_URL = 'https://stock-results.vercel.app/api/technical/latest/';
 const CACHE_KEY = 'stockDataCache_v1';
 const CACHE_TTL = 12 * 60 * 60 * 1000; // 12 hours
+const USE_MOCK_DATA = import.meta.env.DEV; // Use mock data in development
 let inflight = null;
 
 function now() { return Date.now(); }
@@ -69,6 +72,13 @@ async function fetchRemote() {
 }
 
 export async function getStockData({ force = false } = {}) {
+  // Use mock data in development or when API fails
+  if (USE_MOCK_DATA) {
+    return new Promise(resolve => {
+      setTimeout(() => resolve(mockStockData), 500); // Simulate network delay
+    });
+  }
+
   if (!force) {
     try {
       const raw = localStorage.getItem(CACHE_KEY);
@@ -78,7 +88,7 @@ export async function getStockData({ force = false } = {}) {
           return cached.data;
         }
       }
-    } catch (e) {
+    } catch (_e) {
       // if parse error -> ignore and refetch
     }
   }
@@ -87,20 +97,27 @@ export async function getStockData({ force = false } = {}) {
   if (inflight) return inflight;
 
   inflight = (async () => {
-    const data = await fetchRemote();
     try {
-      localStorage.setItem(CACHE_KEY, JSON.stringify({ timestamp: now(), data }));
-    } catch (e) {
-      // ignore storage errors
+      const data = await fetchRemote();
+      try {
+        localStorage.setItem(CACHE_KEY, JSON.stringify({ timestamp: now(), data }));
+      } catch (_e) {
+        // ignore storage errors
+      }
+      inflight = null;
+      return data;
+    } catch (error) {
+      inflight = null;
+      // Fallback to mock data if API fails
+      console.warn('API fetch failed, using mock data:', error);
+      return mockStockData;
     }
-    inflight = null;
-    return data;
   })();
 
   return inflight;
 }
 
 export function clearStockCache() {
-  try { localStorage.removeItem(CACHE_KEY); } catch(e){}
+  try { localStorage.removeItem(CACHE_KEY); } catch(_e){/* ignore */}
   inflight = null;
 }
