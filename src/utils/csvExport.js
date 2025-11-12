@@ -58,6 +58,9 @@ export function downloadCSV(data, filename = 'stock-data.csv') {
     link.click();
     document.body.removeChild(link);
     URL.revokeObjectURL(url);
+  } else {
+    alert('CSV download is not supported in your browser. Please use a modern browser or copy the data manually.');
+    console.warn('CSV download is not supported in this browser.');
   }
 }
 
