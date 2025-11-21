@@ -103,7 +103,7 @@ export default function DataTable({ columns = [], rows = [] }) {
   }
 
   return (
-    <div className="w-full overflow-x-auto">
+    <div className="w-full">
       <div className={`text-sm mb-4 flex flex-wrap items-center gap-4 p-3 rounded-lg transition-colors duration-300 ${
         isDark ? 'bg-gray-700/50 text-gray-300' : 'bg-gray-50 text-gray-600'
       }`}>
@@ -123,7 +123,7 @@ export default function DataTable({ columns = [], rows = [] }) {
         </div>
       </div>
 
-      <div className={`rounded-lg overflow-hidden border shadow-sm transition-colors duration-300 ${
+      <div className={`rounded-lg overflow-x-auto border shadow-sm transition-colors duration-300 ${
         isDark ? 'border-gray-700' : 'border-gray-200'
       }`}>
         <table className={`min-w-full ${isDark ? 'bg-gray-800' : 'bg-white'}`}>

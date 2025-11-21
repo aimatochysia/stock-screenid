@@ -1,8 +1,22 @@
 import React, { useMemo } from 'react';
 import { useTheme } from '../contexts/ThemeContext';
 
-// StockHeatmap: displays stocks as colored boxes based on performance
-// Size represents market cap, color represents price change percentage
+// Treemap layout constants
+const TREEMAP_WIDTH = 1000;
+const TREEMAP_HEIGHT = 600;
+
+// Helper function to calculate worst aspect ratio for a row
+const calculateWorstAspectRatio = (items, rowHeight) => {
+  return Math.max(
+    ...items.map(item => {
+      const itemWidth = item.area / rowHeight;
+      return Math.max(itemWidth / rowHeight, rowHeight / itemWidth);
+    })
+  );
+};
+
+// StockHeatmap: displays stocks as a treemap based on performance
+// Area represents market cap, color represents price change percentage
 export default function StockHeatmap({ data = [], metric = 'priceVsSMA50Pct' }) {
   const { isDark } = useTheme();
   const processedData = useMemo(() => {
@@ -15,10 +29,30 @@ export default function StockHeatmap({ data = [], metric = 'priceVsSMA50Pct' }) 
       stock.marketCap != null
     );
     
-    // Sort by market cap descending
-    return filtered
-      .sort((a, b) => (b.marketCap || 0) - (a.marketCap || 0))
-      .slice(0, 50); // Show top 50 stocks
+    // Sort by market cap descending for treemap algorithm
+    const sorted = filtered.sort((a, b) => (b.marketCap || 0) - (a.marketCap || 0));
+    
+    if (sorted.length === 0) return [];
+    
+    // Calculate total market cap of all stocks
+    const totalMarketCap = sorted.reduce((sum, stock) => sum + (stock.marketCap || 0), 0);
+    
+    // Include stocks until we reach 80% of total market cap
+    const targetMarketCap = totalMarketCap * 0.8;
+    let cumulativeMarketCap = 0;
+    const result = [];
+    
+    for (const stock of sorted) {
+      result.push(stock);
+      cumulativeMarketCap += stock.marketCap || 0;
+      
+      // Stop when we've reached 80% of total market cap
+      if (cumulativeMarketCap >= targetMarketCap) {
+        break;
+      }
+    }
+    
+    return result;
   }, [data, metric]);
 
   const { minValue, maxValue } = useMemo(() => {
@@ -29,6 +63,75 @@ export default function StockHeatmap({ data = [], metric = 'priceVsSMA50Pct' }) 
       maxValue: Math.max(...values)
     };
   }, [processedData, metric]);
+
+  // Simple treemap layout algorithm using squarified layout
+  const treemapLayout = useMemo(() => {
+    if (processedData.length === 0) return [];
+    
+    const totalMarketCap = processedData.reduce((sum, s) => sum + (s.marketCap || 0), 0);
+    
+    // Normalize market caps to areas
+    const items = processedData.map(stock => ({
+      ...stock,
+      area: ((stock.marketCap || 0) / totalMarketCap) * TREEMAP_WIDTH * TREEMAP_HEIGHT
+    }));
+    
+    // Squarified treemap algorithm
+    const layout = [];
+    let x = 0, y = 0;
+    let remainingWidth = TREEMAP_WIDTH;
+    let currentRow = [];
+    let currentRowArea = 0;
+    
+    const addRow = () => {
+      if (currentRow.length === 0) return;
+      
+      const rowHeight = currentRowArea / remainingWidth;
+      let rowX = x;
+      
+      currentRow.forEach(item => {
+        const itemWidth = item.area / rowHeight;
+        layout.push({
+          ...item,
+          x: rowX,
+          y: y,
+          width: itemWidth,
+          height: rowHeight
+        });
+        rowX += itemWidth;
+      });
+      
+      y += rowHeight;
+      currentRow = [];
+      currentRowArea = 0;
+    };
+    
+    items.forEach((item, idx) => {
+      currentRow.push(item);
+      currentRowArea += item.area;
+      
+      // Calculate aspect ratio for current row
+      const rowHeight = currentRowArea / remainingWidth;
+      const worstAspectRatio = calculateWorstAspectRatio(currentRow, rowHeight);
+      
+      // If adding next item would worsen aspect ratio, finalize current row
+      if (idx < items.length - 1) {
+        const nextArea = currentRowArea + items[idx + 1].area;
+        const nextRowHeight = nextArea / remainingWidth;
+        const nextRowItems = [...currentRow, items[idx + 1]];
+        const nextWorstAspectRatio = calculateWorstAspectRatio(nextRowItems, nextRowHeight);
+        
+        if (nextWorstAspectRatio > worstAspectRatio && currentRow.length > 0) {
+          addRow();
+        }
+      }
+    });
+    
+    // Add remaining row
+    addRow();
+    
+    return layout;
+  }, [processedData]);
 
   const getColor = (value) => {
     if (value == null) return isDark ? 'rgb(55, 65, 81)' : 'rgb(229, 231, 235)';
@@ -72,16 +175,6 @@ export default function StockHeatmap({ data = [], metric = 'priceVsSMA50Pct' }) 
     }
   };
 
-  const getSize = (marketCap, allStocks) => {
-    if (!marketCap || allStocks.length === 0) return 80;
-    const maxCap = Math.max(...allStocks.map(s => s.marketCap || 0));
-    const minCap = Math.min(...allStocks.filter(s => s.marketCap > 0).map(s => s.marketCap || 0));
-    
-    // Size between 60 and 200 pixels
-    const ratio = (marketCap - minCap) / (maxCap - minCap || 1);
-    return 60 + Math.floor(ratio * 140);
-  };
-
   if (processedData.length === 0) {
     return (
       <div className={`p-8 text-center rounded-lg ${isDark ? 'bg-gray-800 text-gray-400' : 'bg-gray-50 text-gray-500'}`}>
@@ -93,7 +186,7 @@ export default function StockHeatmap({ data = [], metric = 'priceVsSMA50Pct' }) 
   return (
     <div className={`rounded-lg border p-4 transition-colors duration-300 ${isDark ? 'bg-gray-800/50 border-gray-700' : 'bg-white border-gray-200'}`}>
       <div className="mb-4">
-        <h3 className={`text-lg font-semibold mb-2 ${isDark ? 'text-gray-200' : 'text-gray-800'}`}>Stock Performance Heat Map</h3>
+        <h3 className={`text-lg font-semibold mb-2 ${isDark ? 'text-gray-200' : 'text-gray-800'}`}>Stock Performance Treemap</h3>
         <div className={`flex items-center gap-4 text-sm ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
           <div className="flex items-center gap-2">
             <span>Color: {metric === 'priceVsSMA50Pct' ? 'Price vs SMA50' : metric} (%)</span>
@@ -119,52 +212,68 @@ export default function StockHeatmap({ data = [], metric = 'priceVsSMA50Pct' }) 
         </div>
       </div>
       
-      <div className="flex flex-wrap gap-2 justify-center">
-        {processedData.map((stock) => {
-          const size = getSize(stock.marketCap, processedData);
-          const color = getColor(stock[metric]);
-          const value = stock[metric];
-          
-          return (
-            <div
-              key={stock.symbol}
-              className="relative group cursor-pointer transition-all duration-300 hover:scale-110 hover:z-10 rounded-lg shadow-md hover:shadow-2xl"
-              style={{
-                width: `${size}px`,
-                height: `${size}px`,
-                backgroundColor: color,
-                minWidth: '60px',
-                minHeight: '60px'
-              }}
-              title={`${stock.symbol}: ${value?.toFixed(2)}%`}
-            >
-              <div className="absolute inset-0 flex flex-col items-center justify-center p-1">
-                <span className={`font-bold text-xs break-all text-center leading-tight ${isDark ? 'text-white' : 'text-gray-900'}`}>
-                  {stock.symbol}
-                </span>
-                <span className={`text-xs font-semibold mt-0.5 ${isDark ? 'text-gray-200' : 'text-gray-800'}`}>
-                  {value?.toFixed(1)}%
-                </span>
-              </div>
-              
-              {/* Tooltip on hover */}
-              <div className={`absolute hidden group-hover:block z-20 text-xs rounded-lg p-3 -top-28 left-1/2 transform -translate-x-1/2 w-52 shadow-2xl border ${
-                isDark ? 'bg-gray-900 text-white border-gray-700' : 'bg-white text-gray-900 border-gray-300'
-              }`}>
-                <div className="font-bold mb-2 text-sm">{stock.symbol}</div>
-                <div className="space-y-1">
-                  <div>Close: ${stock.close?.toFixed(2)}</div>
-                  <div>Market Cap: {formatMarketCap(stock.marketCap)}</div>
-                  <div>{metric}: {value?.toFixed(2)}%</div>
-                  <div>Stage: {stock.marketStage || 'N/A'}</div>
-                </div>
-                <div className={`absolute w-3 h-3 transform rotate-45 -bottom-1.5 left-1/2 -translate-x-1/2 ${
-                  isDark ? 'bg-gray-900 border-r border-b border-gray-700' : 'bg-white border-r border-b border-gray-300'
-                }`}></div>
-              </div>
-            </div>
-          );
-        })}
+      {/* Treemap container with responsive sizing */}
+      <div className="w-full" style={{ paddingBottom: '60%', position: 'relative' }}>
+        <svg
+          viewBox="0 0 1000 600"
+          className="absolute inset-0 w-full h-full"
+          style={{ maxHeight: '600px' }}
+        >
+          {treemapLayout.map((stock) => {
+            const color = getColor(stock[metric]);
+            const value = stock[metric];
+            
+            return (
+              <g key={stock.symbol}>
+                <rect
+                  x={stock.x}
+                  y={stock.y}
+                  width={stock.width}
+                  height={stock.height}
+                  fill={color}
+                  stroke={isDark ? '#374151' : '#e5e7eb'}
+                  strokeWidth="2"
+                  className="transition-all duration-300 hover:opacity-80 cursor-pointer"
+                  style={{ filter: 'url(#shadow)' }}
+                />
+                {/* Stock symbol */}
+                {stock.width > 60 && stock.height > 30 && (
+                  <text
+                    x={stock.x + stock.width / 2}
+                    y={stock.y + stock.height / 2 - 8}
+                    textAnchor="middle"
+                    className={`font-bold text-sm ${isDark ? 'fill-white' : 'fill-gray-900'}`}
+                    style={{ fontSize: Math.min(stock.width / 5, stock.height / 3, 18) }}
+                  >
+                    {stock.symbol}
+                  </text>
+                )}
+                {/* Performance percentage */}
+                {stock.width > 60 && stock.height > 50 && (
+                  <text
+                    x={stock.x + stock.width / 2}
+                    y={stock.y + stock.height / 2 + 12}
+                    textAnchor="middle"
+                    className={`font-semibold ${isDark ? 'fill-gray-200' : 'fill-gray-800'}`}
+                    style={{ fontSize: Math.min(stock.width / 6, stock.height / 4, 14) }}
+                  >
+                    {value?.toFixed(1)}%
+                  </text>
+                )}
+                {/* Tooltip group */}
+                <title>
+                  {`${stock.symbol}\nClose: $${stock.close?.toFixed(2)}\nMarket Cap: ${formatMarketCap(stock.marketCap)}\n${metric}: ${value?.toFixed(2)}%\nStage: ${stock.marketStage || 'N/A'}`}
+                </title>
+              </g>
+            );
+          })}
+          {/* Shadow filter definition */}
+          <defs>
+            <filter id="shadow" x="-50%" y="-50%" width="200%" height="200%">
+              <feDropShadow dx="0" dy="1" stdDeviation="2" floodOpacity="0.3"/>
+            </filter>
+          </defs>
+        </svg>
       </div>
     </div>
   );
