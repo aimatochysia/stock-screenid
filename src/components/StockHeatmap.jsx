@@ -32,6 +32,8 @@ export default function StockHeatmap({ data = [], metric = 'priceVsSMA50Pct' }) 
     // Sort by market cap descending for treemap algorithm
     const sorted = filtered.sort((a, b) => (b.marketCap || 0) - (a.marketCap || 0));
     
+    if (sorted.length === 0) return [];
+    
     // Calculate total market cap of all stocks
     const totalMarketCap = sorted.reduce((sum, stock) => sum + (stock.marketCap || 0), 0);
     
@@ -50,8 +52,7 @@ export default function StockHeatmap({ data = [], metric = 'priceVsSMA50Pct' }) 
       }
     }
     
-    // Return at least the top stocks if we have them, or all if less than target
-    return result.length > 0 ? result : sorted;
+    return result;
   }, [data, metric]);
 
   const { minValue, maxValue } = useMemo(() => {
