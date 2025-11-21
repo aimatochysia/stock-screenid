@@ -1,6 +1,20 @@
 import React, { useMemo } from 'react';
 import { useTheme } from '../contexts/ThemeContext';
 
+// Treemap layout constants
+const TREEMAP_WIDTH = 1000;
+const TREEMAP_HEIGHT = 600;
+
+// Helper function to calculate worst aspect ratio for a row
+const calculateWorstAspectRatio = (items, rowHeight) => {
+  return Math.max(
+    ...items.map(item => {
+      const itemWidth = item.area / rowHeight;
+      return Math.max(itemWidth / rowHeight, rowHeight / itemWidth);
+    })
+  );
+};
+
 // StockHeatmap: displays stocks as a treemap based on performance
 // Area represents market cap, color represents price change percentage
 export default function StockHeatmap({ data = [], metric = 'priceVsSMA50Pct' }) {
@@ -34,20 +48,18 @@ export default function StockHeatmap({ data = [], metric = 'priceVsSMA50Pct' }) 
   const treemapLayout = useMemo(() => {
     if (processedData.length === 0) return [];
     
-    const width = 1000; // Base width
-    const height = 600; // Base height
     const totalMarketCap = processedData.reduce((sum, s) => sum + (s.marketCap || 0), 0);
     
     // Normalize market caps to areas
     const items = processedData.map(stock => ({
       ...stock,
-      area: ((stock.marketCap || 0) / totalMarketCap) * width * height
+      area: ((stock.marketCap || 0) / totalMarketCap) * TREEMAP_WIDTH * TREEMAP_HEIGHT
     }));
     
     // Squarified treemap algorithm
     const layout = [];
     let x = 0, y = 0;
-    let remainingWidth = width;
+    let remainingWidth = TREEMAP_WIDTH;
     let currentRow = [];
     let currentRowArea = 0;
     
@@ -80,27 +92,14 @@ export default function StockHeatmap({ data = [], metric = 'priceVsSMA50Pct' }) 
       
       // Calculate aspect ratio for current row
       const rowHeight = currentRowArea / remainingWidth;
-      const worstAspectRatio = Math.max(
-        ...currentRow.map(i => Math.max(
-          (i.area / rowHeight) / rowHeight,
-          rowHeight / (i.area / rowHeight)
-        ))
-      );
+      const worstAspectRatio = calculateWorstAspectRatio(currentRow, rowHeight);
       
       // If adding next item would worsen aspect ratio, finalize current row
       if (idx < items.length - 1) {
         const nextArea = currentRowArea + items[idx + 1].area;
         const nextRowHeight = nextArea / remainingWidth;
-        const nextWorstAspectRatio = Math.max(
-          ...currentRow.map(i => Math.max(
-            (i.area / nextRowHeight) / nextRowHeight,
-            nextRowHeight / (i.area / nextRowHeight)
-          )),
-          Math.max(
-            (items[idx + 1].area / nextRowHeight) / nextRowHeight,
-            nextRowHeight / (items[idx + 1].area / nextRowHeight)
-          )
-        );
+        const nextRowItems = [...currentRow, items[idx + 1]];
+        const nextWorstAspectRatio = calculateWorstAspectRatio(nextRowItems, nextRowHeight);
         
         if (nextWorstAspectRatio > worstAspectRatio && currentRow.length > 0) {
           addRow();
