@@ -70,7 +70,7 @@ export default function ChartPage() {
                 {ticker}
                 {stockInfo && (
                   <span className={`ml-4 text-lg font-normal ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
-                    ${stockInfo.close?.toFixed(2) || 'N/A'}
+                    IDR{stockInfo.close?.toFixed(2) || 'N/A'}
                   </span>
                 )}
               </h1>
@@ -85,7 +85,7 @@ export default function ChartPage() {
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8">
+      <div className="max-w-8xl mx-auto px-4 sm:px-6 py-8">
         {loading && (
           <div className="flex flex-col items-center justify-center py-20">
             <div className={`animate-spin rounded-full h-12 w-12 border-b-2 mb-4 ${isDark ? 'border-blue-400' : 'border-blue-500'}`}></div>

@@ -11,14 +11,14 @@ export default function LandingPage() {
       <div className="container mx-auto px-4 py-20">
         <div className="text-center animate-fade-in">
           <h1 className={`text-6xl md:text-7xl font-bold mb-6 ${isDark ? 'text-white' : 'bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-transparent'}`}>
-            Stock Screener
+            Screenid
           </h1>
           <h2 className={`text-3xl md:text-4xl font-semibold mb-8 ${isDark ? 'text-blue-300' : 'text-gray-700'}`}>
-            Dashboard
+            Indonesia’s Stocks Screening, Made Accessible
           </h2>
           
           <p className={`text-xl md:text-2xl mb-12 max-w-3xl mx-auto ${isDark ? 'text-gray-300' : 'text-gray-600'}`}>
-            Real-time market insights with advanced analytics, comprehensive technical indicators, and intuitive visualizations
+            Daily market insights with advanced analytics, comprehensive technical indicators, and intuitive visualizations
           </p>
 
           <button
@@ -37,7 +37,7 @@ export default function LandingPage() {
         <div className="grid md:grid-cols-3 gap-8 mt-24 animate-slide-up">
           <FeatureCard
             icon="📊"
-            title="Real-Time Data"
+            title="Daily Data Update"
             description="Live stock data with 12-hour intelligent caching for optimal performance"
             isDark={isDark}
           />
@@ -68,21 +68,21 @@ export default function LandingPage() {
           <FeatureCard
             icon="⬇️"
             title="Export Data"
-            description="Download your filtered data in CSV format for further analysis"
+            description="Download technical analysis screening result in CSV format for offline analysis"
             isDark={isDark}
           />
         </div>
 
         <div className="mt-24 grid md:grid-cols-4 gap-6 animate-slide-up">
-          <StatCard value="50+" label="Stocks Tracked" isDark={isDark} />
+          <StatCard value="800+" label="Stocks Tracked" isDark={isDark} />
           <StatCard value="15+" label="Technical Indicators" isDark={isDark} />
           <StatCard value="12h" label="Cache Duration" isDark={isDark} />
-          <StatCard value="100%" label="Real-Time" isDark={isDark} />
+          <StatCard value="Guaranteed" label="Daily Updates" isDark={isDark} />
         </div>
       </div>
 
       <div className={`text-center py-8 ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
-        <p className="text-sm">Built with React, Vite, and TailwindCSS</p>
+        <p className="text-sm">Made by Petra Michael</p>
       </div>
     </div>
   );

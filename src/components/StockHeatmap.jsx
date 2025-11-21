@@ -3,7 +3,7 @@ import { useTheme } from '../contexts/ThemeContext';
 
 
 const TREEMAP_WIDTH = 1000;
-const TREEMAP_HEIGHT = 600;
+const TREEMAP_HEIGHT = 1000;
 
 
 const calculateWorstAspectRatio = (items, rowHeight) => {
@@ -211,9 +211,8 @@ export default function StockHeatmap({ data = [], metric = 'priceVsSMA50Pct' }) 
       
       <div className="w-full" style={{ paddingBottom: '60%', position: 'relative' }}>
         <svg
-          viewBox="0 0 1000 600"
+          viewBox="0 0 1000 1000"
           className="absolute inset-0 w-full h-full"
-          style={{ maxHeight: '600px' }}
         >
           {treemapLayout.map((stock) => {
             const color = getColor(stock[metric]);

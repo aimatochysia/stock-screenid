@@ -88,16 +88,16 @@ export default function Dashboard() {
 
   return (
     <div className={`min-h-screen transition-colors duration-300 ${isDark ? 'bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900' : 'bg-gradient-to-br from-gray-50 to-gray-100'}`}>
-      <div className="p-4 sm:p-6 mx-auto animate-fade-in" style={{ maxWidth: '100rem' }}>
+      <div className="p-4 sm:p-6 mx-auto animate-fade-in" style={{ maxWidth: '100%' }}>
 
         <div className={`rounded-xl shadow-lg p-6 mb-6 transition-colors duration-300 ${isDark ? 'bg-gray-800 border border-gray-700' : 'bg-white'}`}>
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
             <div>
               <h1 className={`text-3xl font-bold bg-gradient-to-r ${isDark ? 'from-blue-400 to-purple-400' : 'from-blue-600 to-purple-600'} bg-clip-text text-transparent`}>
-                Stock Screener Dashboard
+                Dashboard
               </h1>
               <p className={`text-sm mt-2 ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
-                Real-time market insights with 12-hour caching for optimal performance
+                Daily market insights with 12-hour caching for optimal performance
               </p>
             </div>
 
@@ -162,6 +162,18 @@ export default function Dashboard() {
           </div>
         )}
 
+        <div className={`mt-6 text-xs p-4 rounded-lg shadow-sm transition-colors duration-300 ${isDark ? 'bg-gray-800 text-gray-400 border border-gray-700' : 'bg-white text-gray-500'}`}>
+          <p className="font-semibold mb-2">💡 Tips:</p>
+          <ul className="list-disc list-inside space-y-1">
+            <li>Click any column header to sort (click again to reverse order)</li>
+            <li>Use the filter icon (⚲) next to headers to filter data</li>
+            <li>Hover over heatmap boxes for detailed information</li>
+            <li>Data is cached for 12 hours to minimize API calls</li>
+            <li>Download data as CSV for offline analysis</li>
+          </ul>
+        </div>
+        <div className="mb-6"></div>
+
         <div className={`rounded-xl shadow-lg p-6 transition-colors duration-300 ${isDark ? 'bg-gray-800 border border-gray-700' : 'bg-white'}`}>
           <Tabs tabs={tabs} active={activeTab} onChange={setActiveTab} />
           
@@ -204,17 +216,6 @@ export default function Dashboard() {
               </div>
             )}
           </div>
-        </div>
-
-        <div className={`mt-6 text-xs p-4 rounded-lg shadow-sm transition-colors duration-300 ${isDark ? 'bg-gray-800 text-gray-400 border border-gray-700' : 'bg-white text-gray-500'}`}>
-          <p className="font-semibold mb-2">💡 Tips:</p>
-          <ul className="list-disc list-inside space-y-1">
-            <li>Click any column header to sort (click again to reverse order)</li>
-            <li>Use the filter icon (⚲) next to headers to filter data</li>
-            <li>Hover over heatmap boxes for detailed information</li>
-            <li>Data is cached for 12 hours to minimize API calls</li>
-            <li>Download data as CSV for offline analysis</li>
-          </ul>
         </div>
       </div>
     </div>
