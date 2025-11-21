@@ -48,7 +48,6 @@ export default function StockHeatmap({ data = [], metric = 'priceVsSMA50Pct' }) 
     const layout = [];
     let x = 0, y = 0;
     let remainingWidth = width;
-    let remainingHeight = height;
     let currentRow = [];
     let currentRowArea = 0;
     
@@ -71,7 +70,6 @@ export default function StockHeatmap({ data = [], metric = 'priceVsSMA50Pct' }) 
       });
       
       y += rowHeight;
-      remainingHeight -= rowHeight;
       currentRow = [];
       currentRowArea = 0;
     };
