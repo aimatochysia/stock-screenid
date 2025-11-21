@@ -25,6 +25,24 @@ export default function DataTable({ columns = [], rows = [] }) {
   const [sortDir, setSortDir] = useState('asc'); // 'asc' | 'desc'
   const [filters, setFilters] = useState({}); // { colKey: { type: 'range'|'set', min, max, set: Set(...) } }
   const [openFilter, setOpenFilter] = useState(null);
+  const tableContainerRef = React.useRef(null);
+
+  // Handle horizontal scrolling with mouse wheel
+  React.useEffect(() => {
+    const container = tableContainerRef.current;
+    if (!container) return;
+
+    const handleWheel = (e) => {
+      // Only handle horizontal scroll if content overflows
+      if (container.scrollWidth > container.clientWidth) {
+        e.preventDefault();
+        container.scrollLeft += e.deltaY;
+      }
+    };
+
+    container.addEventListener('wheel', handleWheel, { passive: false });
+    return () => container.removeEventListener('wheel', handleWheel);
+  }, []);
 
   const uniqueValues = useMemo(() => {
     const map = {};
@@ -123,7 +141,9 @@ export default function DataTable({ columns = [], rows = [] }) {
         </div>
       </div>
 
-      <div className={`rounded-lg overflow-x-auto border shadow-sm transition-colors duration-300 ${
+      <div 
+        ref={tableContainerRef}
+        className={`rounded-lg overflow-x-auto border shadow-sm transition-colors duration-300 ${
         isDark ? 'border-gray-700' : 'border-gray-200'
       }`}>
         <table className={`min-w-full ${isDark ? 'bg-gray-800' : 'bg-white'}`}>

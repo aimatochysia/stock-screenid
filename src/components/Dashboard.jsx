@@ -88,7 +88,7 @@ export default function Dashboard() {
 
   return (
     <div className={`min-h-screen transition-colors duration-300 ${isDark ? 'bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900' : 'bg-gradient-to-br from-gray-50 to-gray-100'}`}>
-      <div className="p-4 sm:p-6 max-w-7xl mx-auto animate-fade-in">
+      <div className="p-4 sm:p-6 mx-auto animate-fade-in" style={{ maxWidth: '100rem' }}>
         {/* Header Section */}
         <div className={`rounded-xl shadow-lg p-6 mb-6 transition-colors duration-300 ${isDark ? 'bg-gray-800 border border-gray-700' : 'bg-white'}`}>
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
