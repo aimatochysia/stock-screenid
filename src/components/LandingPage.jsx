@@ -1,8 +1,10 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useTheme } from '../contexts/ThemeContext';
 
-export default function LandingPage({ onEnter }) {
+export default function LandingPage() {
   const { isDark } = useTheme();
+  const navigate = useNavigate();
 
   return (
     <div className={`min-h-screen ${isDark ? 'bg-gradient-to-br from-gray-900 via-blue-900 to-purple-900' : 'bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50'} transition-colors duration-300`}>
@@ -24,7 +26,7 @@ export default function LandingPage({ onEnter }) {
 
           {/* CTA Button */}
           <button
-            onClick={onEnter}
+            onClick={() => navigate('/dashboard')}
             className={`group relative px-10 py-5 text-xl font-bold rounded-2xl transition-all duration-300 transform hover:scale-105 shadow-2xl ${
               isDark 
                 ? 'bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 text-white' 

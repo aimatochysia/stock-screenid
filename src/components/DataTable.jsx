@@ -1,6 +1,6 @@
 import React, { useState, useMemo } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useTheme } from '../contexts/ThemeContext';
-import StockChartModal from './StockChartModal';
 
 
 // Props:
@@ -22,12 +22,12 @@ function compare(a, b, type, dir) {
 
 export default function DataTable({ columns = [], rows = [] }) {
   const { isDark } = useTheme();
+  const navigate = useNavigate();
   const [sortKey, setSortKey] = useState(null);
   const [sortDir, setSortDir] = useState('asc'); // 'asc' | 'desc'
   const [filters, setFilters] = useState({}); // { colKey: { type: 'range'|'set', min, max, set: Set(...) } }
   const [openFilter, setOpenFilter] = useState(null);
   const tableContainerRef = React.useRef(null);
-  const [selectedStock, setSelectedStock] = useState(null);
 
   // Handle horizontal scrolling with mouse wheel
   React.useEffect(() => {
@@ -124,15 +124,6 @@ export default function DataTable({ columns = [], rows = [] }) {
 
   return (
     <div className="w-full">
-      {/* Stock Chart Modal */}
-      {selectedStock && (
-        <StockChartModal
-          ticker={selectedStock.symbol}
-          db={selectedStock.db}
-          onClose={() => setSelectedStock(null)}
-        />
-      )}
-      
       <div className={`text-sm mb-4 flex flex-wrap items-center gap-4 p-3 rounded-lg transition-colors duration-300 ${
         isDark ? 'bg-gray-700/50 text-gray-300' : 'bg-gray-50 text-gray-600'
       }`}>
@@ -385,7 +376,7 @@ export default function DataTable({ columns = [], rows = [] }) {
     if (col.key === 'symbol') {
       return (
         <button
-          onClick={() => row.db && setSelectedStock({ symbol: String(v), db: row.db })}
+          onClick={() => row.db && navigate(`/chart/${String(v)}`)}
           className={`font-bold ${
             row.db 
               ? (isDark ? 'text-blue-400 hover:text-blue-300 underline cursor-pointer' : 'text-blue-600 hover:text-blue-700 underline cursor-pointer')
