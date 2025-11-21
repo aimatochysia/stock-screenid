@@ -51,6 +51,9 @@ export default function StockChart({ data, ticker }) {
     // Clear existing chart
     if (chartRef.current) {
       chartRef.current.remove();
+      // Clear series references since chart is removed
+      candlestickSeriesRef.current = null;
+      maSeriesRefs.current = {};
     }
 
     // Create chart
@@ -129,13 +132,7 @@ export default function StockChart({ data, ticker }) {
       close: item.close,
     }));
 
-    // Clear old MA series
-    Object.values(maSeriesRefs.current).forEach(series => {
-      if (series) chart.removeSeries(series);
-    });
-    maSeriesRefs.current = {};
-
-    // Add enabled MA series
+    // Add enabled MA series (no need to clear since we already reset maSeriesRefs)
     Object.entries(maSettings).forEach(([key, settings]) => {
       if (settings.enabled) {
         const period = parseInt(key.replace('ma', ''));
