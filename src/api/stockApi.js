@@ -1,21 +1,14 @@
-// src/api/stockApi.js
-// Cache TTL = 12 hours. Exposes getStockData({force}) and clearStockCache()
-
 import { mockStockData } from './mockData';
 
 const INFO_URL = 'https://stock-results.vercel.app/api/info';
 const TECH_URL = 'https://stock-results.vercel.app/api/technical/latest/';
 const CACHE_KEY = 'stockDataCache_v1';
-const CACHE_TTL = 12 * 60 * 60 * 1000; // 12 hours
+const CACHE_TTL = 12 * 60 * 60 * 1000; 
 let inflight = null;
-
-// Check if we're in demo mode (API blocked or unavailable)
 const USE_MOCK_DATA = import.meta.env.VITE_USE_MOCK_DATA === 'true' || false;
-
 function now() { return Date.now(); }
-
 async function fetchRemote() {
-  // If mock data enabled, return it immediately
+  
   if (USE_MOCK_DATA) {
     return new Promise(resolve => setTimeout(() => resolve(mockStockData), 500));
   }
@@ -31,24 +24,26 @@ async function fetchRemote() {
     const infoJson = await infoRes.json();
     const techJson = await techRes.json();
 
-    // merge -> map by symbol
+    
     const map = {};
 
-    // Put info keyed by symbol
+    
     Object.keys(infoJson).forEach(symbol => {
       map[symbol] = { symbol, ...infoJson[symbol] };
     });
 
-    // Add technical info; raw keys are like "EMDE.JK.json" -> remove .json
+    
     Object.keys(techJson).forEach(rawKey => {
       const symbol = rawKey.replace(/\.json$/, '');
       const t = techJson[rawKey];
 
       const entry = map[symbol] || { symbol };
 
-      // pick and flatten the technical keys we need
+      
       Object.assign(entry, {
-        // basic
+        
+        db: t.db,
+        
         close: t.close,
         volume: t.volume,
         relativeVolume: t.relative_volume,
@@ -57,7 +52,7 @@ async function fetchRemote() {
         atr14: t.atr_14,
         atrPct: t.atr_pct,
         marketStage: t.market_stage,
-        // SMAs and diff percentages
+        
         sma_5: t.sma_5,
         sma_5_diff_pct: t.sma_5_diff_pct,
         sma_10: t.sma_10,
@@ -75,10 +70,10 @@ async function fetchRemote() {
       map[symbol] = entry;
     });
 
-    // convert to array
+    
     return Object.values(map);
   } catch (error) {
-    // Fallback to mock data if API fails
+    
     console.warn('API fetch failed, using mock data:', error.message);
     return mockStockData;
   }
@@ -95,11 +90,11 @@ export async function getStockData({ force = false } = {}) {
         }
       }
     } catch {
-      // if parse error -> ignore and refetch
+      //
     }
   }
 
-  // reuse inflight promise if present (avoid duplicate fetch)
+  
   if (inflight) return inflight;
 
   inflight = (async () => {
@@ -107,7 +102,7 @@ export async function getStockData({ force = false } = {}) {
     try {
       localStorage.setItem(CACHE_KEY, JSON.stringify({ timestamp: now(), data }));
     } catch {
-      // ignore storage errors
+      //
     }
     inflight = null;
     return data;
@@ -120,7 +115,7 @@ export function clearStockCache() {
   try { 
     localStorage.removeItem(CACHE_KEY); 
   } catch {
-    // ignore storage errors
+    //
   }
   inflight = null;
 }

@@ -1,10 +1,11 @@
 import React, { useState, useMemo } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useTheme } from '../contexts/ThemeContext';
 
 
-// Props:
-//  - columns: [{ key, label, type: 'number'|'string'|'category', width? }]
-//  - rows: array of objects (each row must have key columns)
+
+
+
 
 function compare(a, b, type, dir) {
   if (a == null && b == null) return 0;
@@ -14,17 +15,36 @@ function compare(a, b, type, dir) {
   if (type === 'number') {
     return (a - b) * (dir === 'asc' ? 1 : -1);
   } else {
-    // string fallback
+    
     return String(a).localeCompare(String(b)) * (dir === 'asc' ? 1 : -1);
   }
 }
 
 export default function DataTable({ columns = [], rows = [] }) {
   const { isDark } = useTheme();
+  const navigate = useNavigate();
   const [sortKey, setSortKey] = useState(null);
-  const [sortDir, setSortDir] = useState('asc'); // 'asc' | 'desc'
-  const [filters, setFilters] = useState({}); // { colKey: { type: 'range'|'set', min, max, set: Set(...) } }
+  const [sortDir, setSortDir] = useState('asc'); 
+  const [filters, setFilters] = useState({}); 
   const [openFilter, setOpenFilter] = useState(null);
+  const tableContainerRef = React.useRef(null);
+
+  
+  React.useEffect(() => {
+    const container = tableContainerRef.current;
+    if (!container) return;
+
+    const handleWheel = (e) => {
+      
+      if (container.scrollWidth > container.clientWidth) {
+        e.preventDefault();
+        container.scrollLeft += e.deltaY;
+      }
+    };
+
+    container.addEventListener('wheel', handleWheel, { passive: false });
+    return () => container.removeEventListener('wheel', handleWheel);
+  }, []);
 
   const uniqueValues = useMemo(() => {
     const map = {};
@@ -39,7 +59,7 @@ export default function DataTable({ columns = [], rows = [] }) {
   const filteredAndSorted = useMemo(() => {
     let list = rows.slice();
 
-    //filter
+    
     Object.keys(filters).forEach(colKey => {
       const cfg = filters[colKey];
       if (!cfg) return;
@@ -59,7 +79,7 @@ export default function DataTable({ columns = [], rows = [] }) {
       }
     });
 
-    //sort
+    
     if (sortKey) {
       const col = columns.find(c => c.key === sortKey);
       const type = col?.type === 'number' ? 'number' : 'string';
@@ -123,7 +143,9 @@ export default function DataTable({ columns = [], rows = [] }) {
         </div>
       </div>
 
-      <div className={`rounded-lg overflow-x-auto border shadow-sm transition-colors duration-300 ${
+      <div 
+        ref={tableContainerRef}
+        className={`rounded-lg overflow-x-auto border shadow-sm transition-colors duration-300 ${
         isDark ? 'border-gray-700' : 'border-gray-200'
       }`}>
         <table className={`min-w-full ${isDark ? 'bg-gray-800' : 'bg-white'}`}>
@@ -306,21 +328,21 @@ export default function DataTable({ columns = [], rows = [] }) {
     if (v == null || v === '') return <span className={isDark ? 'text-gray-600' : 'text-gray-400'}>—</span>;
     
     if (col.type === 'number') {
-      // Format large numbers
+      
       const formattedValue = Number.isInteger(v) && Math.abs(v) > 999 
         ? formatNumber(v) 
         : (typeof v === 'number' ? round(v) : String(v));
       
-      // Color code based on context
+      
       let colorClass = isDark ? 'text-gray-300' : 'text-gray-700';
       
-      // Percentage fields - color based on positive/negative
+      
       if (col.key.includes('Pct') || col.key.includes('pct') || col.key.includes('Growth') || col.key.includes('Margin') || col.key.includes('Yield')) {
         if (v > 0) colorClass = isDark ? 'text-green-400 font-semibold' : 'text-green-600 font-semibold';
         else if (v < 0) colorClass = isDark ? 'text-red-400 font-semibold' : 'text-red-600 font-semibold';
       }
       
-      // RSI - overbought/oversold
+      
       if (col.key === 'rsi14') {
         if (v > 70) colorClass = isDark ? 'text-red-400 font-semibold' : 'text-red-600 font-semibold';
         else if (v < 30) colorClass = isDark ? 'text-green-400 font-semibold' : 'text-green-600 font-semibold';
@@ -329,7 +351,7 @@ export default function DataTable({ columns = [], rows = [] }) {
       return <span className={colorClass}>{formattedValue}</span>;
     }
     
-    // Category - add badge styling for market stage
+    
     if (col.key === 'marketStage') {
       const stageColors = isDark ? {
         'Stage 1': 'bg-yellow-900/40 text-yellow-400 border border-yellow-700',
@@ -350,9 +372,22 @@ export default function DataTable({ columns = [], rows = [] }) {
       );
     }
     
-    // Symbol - make it bold and prominent
+    
     if (col.key === 'symbol') {
-      return <span className={`font-bold ${isDark ? 'text-blue-400' : 'text-blue-600'}`}>{String(v)}</span>;
+      return (
+        <button
+          onClick={() => row.db && navigate(`/chart/${String(v)}`)}
+          className={`font-bold ${
+            row.db 
+              ? (isDark ? 'text-blue-400 hover:text-blue-300 underline cursor-pointer' : 'text-blue-600 hover:text-blue-700 underline cursor-pointer')
+              : (isDark ? 'text-gray-400' : 'text-gray-600')
+          }`}
+          disabled={!row.db}
+          title={row.db ? 'Click to view chart' : 'Chart not available'}
+        >
+          {String(v)}
+        </button>
+      );
     }
     
     return <span className={isDark ? 'text-gray-300' : 'text-gray-700'}>{String(v)}</span>;

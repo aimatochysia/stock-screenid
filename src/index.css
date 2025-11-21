@@ -2,19 +2,16 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Smooth transitions for theme changes */
 * {
   transition-property: background-color, border-color, color;
   transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
   transition-duration: 200ms;
 }
 
-/* Add specific transitions for interactive elements */
 input, textarea, select, button {
   transition-property: background-color, border-color, color, transform, box-shadow;
 }
 
-/* Dark mode scrollbar styling */
 .dark ::-webkit-scrollbar {
   width: 10px;
   height: 10px;
@@ -33,7 +30,6 @@ input, textarea, select, button {
   background: #6b7280;
 }
 
-/* Light mode scrollbar styling */
 ::-webkit-scrollbar {
   width: 10px;
   height: 10px;

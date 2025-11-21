@@ -1,30 +1,28 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useTheme } from '../contexts/ThemeContext';
 
-export default function LandingPage({ onEnter }) {
+export default function LandingPage() {
   const { isDark } = useTheme();
+  const navigate = useNavigate();
 
   return (
     <div className={`min-h-screen ${isDark ? 'bg-gradient-to-br from-gray-900 via-blue-900 to-purple-900' : 'bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50'} transition-colors duration-300`}>
-      {/* Hero Section */}
       <div className="container mx-auto px-4 py-20">
         <div className="text-center animate-fade-in">
-          {/* Main Title */}
           <h1 className={`text-6xl md:text-7xl font-bold mb-6 ${isDark ? 'text-white' : 'bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-transparent'}`}>
-            Stock Screener
+            Screenid
           </h1>
           <h2 className={`text-3xl md:text-4xl font-semibold mb-8 ${isDark ? 'text-blue-300' : 'text-gray-700'}`}>
-            Dashboard
+            Indonesia’s Stocks Screening, Made Accessible
           </h2>
           
-          {/* Subtitle */}
           <p className={`text-xl md:text-2xl mb-12 max-w-3xl mx-auto ${isDark ? 'text-gray-300' : 'text-gray-600'}`}>
-            Real-time market insights with advanced analytics, comprehensive technical indicators, and intuitive visualizations
+            Daily market insights with advanced analytics, comprehensive technical indicators, and intuitive visualizations
           </p>
 
-          {/* CTA Button */}
           <button
-            onClick={onEnter}
+            onClick={() => navigate('/dashboard')}
             className={`group relative px-10 py-5 text-xl font-bold rounded-2xl transition-all duration-300 transform hover:scale-105 shadow-2xl ${
               isDark 
                 ? 'bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 text-white' 
@@ -36,11 +34,10 @@ export default function LandingPage({ onEnter }) {
           </button>
         </div>
 
-        {/* Features Grid */}
         <div className="grid md:grid-cols-3 gap-8 mt-24 animate-slide-up">
           <FeatureCard
             icon="📊"
-            title="Real-Time Data"
+            title="Daily Data Update"
             description="Live stock data with 12-hour intelligent caching for optimal performance"
             isDark={isDark}
           />
@@ -71,23 +68,21 @@ export default function LandingPage({ onEnter }) {
           <FeatureCard
             icon="⬇️"
             title="Export Data"
-            description="Download your filtered data in CSV format for further analysis"
+            description="Download technical analysis screening result in CSV format for offline analysis"
             isDark={isDark}
           />
         </div>
 
-        {/* Stats Section */}
         <div className="mt-24 grid md:grid-cols-4 gap-6 animate-slide-up">
-          <StatCard value="50+" label="Stocks Tracked" isDark={isDark} />
+          <StatCard value="800+" label="Stocks Tracked" isDark={isDark} />
           <StatCard value="15+" label="Technical Indicators" isDark={isDark} />
           <StatCard value="12h" label="Cache Duration" isDark={isDark} />
-          <StatCard value="100%" label="Real-Time" isDark={isDark} />
+          <StatCard value="Guaranteed" label="Daily Updates" isDark={isDark} />
         </div>
       </div>
 
-      {/* Footer */}
       <div className={`text-center py-8 ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
-        <p className="text-sm">Built with React, Vite, and TailwindCSS</p>
+        <p className="text-sm">Made by Petra Michael</p>
       </div>
     </div>
   );
