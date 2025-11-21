@@ -13,7 +13,7 @@ export default function StockChart({ data, ticker }) {
   const chartContainerRef = useRef(null);
   const chartRef = useRef(null);
   const candlestickSeriesRef = useRef(null);
-  // const volumeSeriesRef = useRef(null); // Commented out temporarily
+  const volumeSeriesRef = useRef(null);
   const maSeriesRefs = useRef({});
   
   const [maSettings, setMaSettings] = useState({
@@ -24,7 +24,6 @@ export default function StockChart({ data, ticker }) {
     ma200: { enabled: false, color: '#7E57C2' },
   });
   
-  const [chartSize, setChartSize] = useState({ width: 800, height: 600 });
   const [showSettings, setShowSettings] = useState(false);
 
   // Calculate moving average
@@ -53,13 +52,18 @@ export default function StockChart({ data, ticker }) {
       chartRef.current.remove();
       // Clear series references since chart is removed
       candlestickSeriesRef.current = null;
+      volumeSeriesRef.current = null;
       maSeriesRefs.current = {};
     }
 
+    // Get container dimensions
+    const containerWidth = chartContainerRef.current.clientWidth;
+    const containerHeight = 600; // Fixed height
+
     // Create chart
     const chart = createChart(chartContainerRef.current, {
-      width: chartSize.width,
-      height: chartSize.height,
+      width: containerWidth,
+      height: containerHeight,
       layout: {
         background: { type: ColorType.Solid, color: isDark ? '#1f2937' : '#ffffff' },
         textColor: isDark ? '#d1d5db' : '#374151',
@@ -103,8 +107,7 @@ export default function StockChart({ data, ticker }) {
     }));
     candlestickSeriesInst.setData(candleData);
 
-    // Add volume series in a separate pane (commented out temporarily for debugging)
-    /*
+    // Add volume series in a separate pane
     const volumeSeriesInst = chart.addSeries(HistogramSeries, {
       color: '#26a69a',
       priceFormat: {
@@ -112,7 +115,7 @@ export default function StockChart({ data, ticker }) {
       },
       priceScaleId: '',
       scaleMargins: {
-        top: 0.8,
+        top: 0.7,
         bottom: 0,
       },
     });
@@ -122,9 +125,9 @@ export default function StockChart({ data, ticker }) {
     const volumeData = data.map(item => ({
       time: item.date,
       value: item.volume,
+      color: item.close >= item.open ? '#26a69a80' : '#ef535080',
     }));
     volumeSeriesInst.setData(volumeData);
-    */
 
     // Add moving averages
     const maData = data.map(item => ({
@@ -152,9 +155,9 @@ export default function StockChart({ data, ticker }) {
 
     // Handle resize
     const handleResize = () => {
-      if (chartContainerRef.current) {
-        const width = chartContainerRef.current.clientWidth;
-        chart.applyOptions({ width });
+      if (chartContainerRef.current && chartRef.current) {
+        const newWidth = chartContainerRef.current.clientWidth;
+        chartRef.current.applyOptions({ width: newWidth });
       }
     };
 
@@ -167,7 +170,7 @@ export default function StockChart({ data, ticker }) {
         chartRef.current = null;
       }
     };
-  }, [data, chartSize, maSettings, isDark]);
+  }, [data, maSettings, isDark]);
 
   const handleMAToggle = (key) => {
     setMaSettings(prev => ({
@@ -180,13 +183,6 @@ export default function StockChart({ data, ticker }) {
     setMaSettings(prev => ({
       ...prev,
       [key]: { ...prev[key], color }
-    }));
-  };
-
-  const handleResize = (dimension, delta) => {
-    setChartSize(prev => ({
-      ...prev,
-      [dimension]: Math.max(400, prev[dimension] + delta)
     }));
   };
 
@@ -251,48 +247,6 @@ export default function StockChart({ data, ticker }) {
                 </div>
               );
             })}
-          </div>
-          
-          <h4 className={`text-sm font-semibold mt-4 mb-3 ${isDark ? 'text-gray-200' : 'text-gray-800'}`}>
-            Chart Size
-          </h4>
-          <div className="flex flex-wrap gap-4">
-            <div className="flex items-center gap-2">
-              <span className={`text-sm ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>Width:</span>
-              <button
-                onClick={() => handleResize('width', -100)}
-                className={`px-3 py-1 rounded ${isDark ? 'bg-gray-600 hover:bg-gray-500' : 'bg-gray-200 hover:bg-gray-300'}`}
-              >
-                -
-              </button>
-              <span className={`text-sm font-mono ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>
-                {chartSize.width}px
-              </span>
-              <button
-                onClick={() => handleResize('width', 100)}
-                className={`px-3 py-1 rounded ${isDark ? 'bg-gray-600 hover:bg-gray-500' : 'bg-gray-200 hover:bg-gray-300'}`}
-              >
-                +
-              </button>
-            </div>
-            <div className="flex items-center gap-2">
-              <span className={`text-sm ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>Height:</span>
-              <button
-                onClick={() => handleResize('height', -100)}
-                className={`px-3 py-1 rounded ${isDark ? 'bg-gray-600 hover:bg-gray-500' : 'bg-gray-200 hover:bg-gray-300'}`}
-              >
-                -
-              </button>
-              <span className={`text-sm font-mono ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>
-                {chartSize.height}px
-              </span>
-              <button
-                onClick={() => handleResize('height', 100)}
-                className={`px-3 py-1 rounded ${isDark ? 'bg-gray-600 hover:bg-gray-500' : 'bg-gray-200 hover:bg-gray-300'}`}
-              >
-                +
-              </button>
-            </div>
           </div>
         </div>
       )}
