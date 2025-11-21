@@ -57,7 +57,6 @@ export function downloadCSV(data, filename = 'stock-data.csv') {
   }
 }
 
-// Fetch latest data from API and download as CSV
 
 export async function downloadLatestDataCSV() {
   try {
