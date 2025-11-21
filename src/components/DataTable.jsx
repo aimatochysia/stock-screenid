@@ -1,5 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import { useTheme } from '../contexts/ThemeContext';
+import StockChartModal from './StockChartModal';
 
 
 // Props:
@@ -26,6 +27,7 @@ export default function DataTable({ columns = [], rows = [] }) {
   const [filters, setFilters] = useState({}); // { colKey: { type: 'range'|'set', min, max, set: Set(...) } }
   const [openFilter, setOpenFilter] = useState(null);
   const tableContainerRef = React.useRef(null);
+  const [selectedStock, setSelectedStock] = useState(null);
 
   // Handle horizontal scrolling with mouse wheel
   React.useEffect(() => {
@@ -122,6 +124,15 @@ export default function DataTable({ columns = [], rows = [] }) {
 
   return (
     <div className="w-full">
+      {/* Stock Chart Modal */}
+      {selectedStock && (
+        <StockChartModal
+          ticker={selectedStock.symbol}
+          db={selectedStock.db}
+          onClose={() => setSelectedStock(null)}
+        />
+      )}
+      
       <div className={`text-sm mb-4 flex flex-wrap items-center gap-4 p-3 rounded-lg transition-colors duration-300 ${
         isDark ? 'bg-gray-700/50 text-gray-300' : 'bg-gray-50 text-gray-600'
       }`}>
@@ -370,9 +381,22 @@ export default function DataTable({ columns = [], rows = [] }) {
       );
     }
     
-    // Symbol - make it bold and prominent
+    // Symbol - make it bold and prominent and clickable
     if (col.key === 'symbol') {
-      return <span className={`font-bold ${isDark ? 'text-blue-400' : 'text-blue-600'}`}>{String(v)}</span>;
+      return (
+        <button
+          onClick={() => row.db && setSelectedStock({ symbol: String(v), db: row.db })}
+          className={`font-bold ${
+            row.db 
+              ? (isDark ? 'text-blue-400 hover:text-blue-300 underline cursor-pointer' : 'text-blue-600 hover:text-blue-700 underline cursor-pointer')
+              : (isDark ? 'text-gray-400' : 'text-gray-600')
+          }`}
+          disabled={!row.db}
+          title={row.db ? 'Click to view chart' : 'Chart not available'}
+        >
+          {String(v)}
+        </button>
+      );
     }
     
     return <span className={isDark ? 'text-gray-300' : 'text-gray-700'}>{String(v)}</span>;

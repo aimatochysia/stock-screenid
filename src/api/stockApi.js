@@ -48,6 +48,8 @@ async function fetchRemote() {
 
       // pick and flatten the technical keys we need
       Object.assign(entry, {
+        // database identifier
+        db: t.db,
         // basic
         close: t.close,
         volume: t.volume,

@@ -2,6 +2,7 @@
 export const mockStockData = [
   {
     symbol: 'AAPL',
+    db: 'stock-db-1',
     close: 178.50,
     marketCap: 2800000000000,
     volume: 45000000,
@@ -29,6 +30,7 @@ export const mockStockData = [
   },
   {
     symbol: 'GOOGL',
+    db: 'stock-db-2',
     close: 142.30,
     marketCap: 1800000000000,
     volume: 28000000,
@@ -56,6 +58,7 @@ export const mockStockData = [
   },
   {
     symbol: 'MSFT',
+    db: 'stock-db-3',
     close: 415.80,
     marketCap: 3100000000000,
     volume: 22000000,
@@ -83,6 +86,7 @@ export const mockStockData = [
   },
   {
     symbol: 'TSLA',
+    db: 'stock-db-4',
     close: 245.60,
     marketCap: 780000000000,
     volume: 105000000,
@@ -110,6 +114,7 @@ export const mockStockData = [
   },
   {
     symbol: 'AMZN',
+    db: 'stock-db-1',
     close: 178.25,
     marketCap: 1850000000000,
     volume: 48000000,
@@ -137,6 +142,7 @@ export const mockStockData = [
   },
   {
     symbol: 'META',
+    db: 'stock-db-2',
     close: 512.30,
     marketCap: 1300000000000,
     volume: 15000000,
@@ -164,6 +170,7 @@ export const mockStockData = [
   },
   {
     symbol: 'NVDA',
+    db: 'stock-db-3',
     close: 880.50,
     marketCap: 2200000000000,
     volume: 42000000,
@@ -191,6 +198,7 @@ export const mockStockData = [
   },
   {
     symbol: 'AMD',
+    db: 'stock-db-4',
     close: 168.90,
     marketCap: 275000000000,
     volume: 52000000,
