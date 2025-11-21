@@ -24,6 +24,7 @@ export default function StockChart({ data, ticker }) {
     ma200: { enabled: false, color: '#7E57C2' },
   });
   
+  const [showVolume, setShowVolume] = useState(true);
   const [showSettings, setShowSettings] = useState(false);
 
   // Calculate moving average
@@ -107,27 +108,29 @@ export default function StockChart({ data, ticker }) {
     }));
     candlestickSeriesInst.setData(candleData);
 
-    // Add volume series in a separate pane
-    const volumeSeriesInst = chart.addSeries(HistogramSeries, {
-      color: '#26a69a',
-      priceFormat: {
-        type: 'volume',
-      },
-      priceScaleId: '',
-      scaleMargins: {
-        top: 0.7,
-        bottom: 0,
-      },
-    });
-    volumeSeriesRef.current = volumeSeriesInst;
+    // Add volume series in a separate pane (if enabled)
+    if (showVolume) {
+      const volumeSeriesInst = chart.addSeries(HistogramSeries, {
+        color: '#26a69a',
+        priceFormat: {
+          type: 'volume',
+        },
+        priceScaleId: '',
+        scaleMargins: {
+          top: 0.7,
+          bottom: 0,
+        },
+      });
+      volumeSeriesRef.current = volumeSeriesInst;
 
-    // Prepare volume data
-    const volumeData = data.map(item => ({
-      time: item.date,
-      value: item.volume,
-      color: item.close >= item.open ? '#26a69a80' : '#ef535080',
-    }));
-    volumeSeriesInst.setData(volumeData);
+      // Prepare volume data
+      const volumeData = data.map(item => ({
+        time: item.date,
+        value: item.volume,
+        color: item.close >= item.open ? '#26a69a80' : '#ef535080',
+      }));
+      volumeSeriesInst.setData(volumeData);
+    }
 
     // Add moving averages
     const maData = data.map(item => ({
@@ -170,7 +173,7 @@ export default function StockChart({ data, ticker }) {
         chartRef.current = null;
       }
     };
-  }, [data, maSettings, isDark]);
+  }, [data, maSettings, showVolume, isDark]);
 
   const handleMAToggle = (key) => {
     setMaSettings(prev => ({
@@ -218,6 +221,25 @@ export default function StockChart({ data, ticker }) {
       {showSettings && (
         <div className={`mb-4 p-4 rounded-lg border ${isDark ? 'bg-gray-700 border-gray-600' : 'bg-gray-50 border-gray-200'}`}>
           <h4 className={`text-sm font-semibold mb-3 ${isDark ? 'text-gray-200' : 'text-gray-800'}`}>
+            Chart Options
+          </h4>
+          
+          {/* Volume Toggle */}
+          <div className="mb-4">
+            <label className="flex items-center gap-2 cursor-pointer">
+              <input
+                type="checkbox"
+                checked={showVolume}
+                onChange={() => setShowVolume(!showVolume)}
+                className="w-4 h-4"
+              />
+              <span className={`text-sm font-medium ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>
+                Show Volume Bars
+              </span>
+            </label>
+          </div>
+
+          <h4 className={`text-sm font-semibold mb-3 mt-4 ${isDark ? 'text-gray-200' : 'text-gray-800'}`}>
             Moving Averages
           </h4>
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
