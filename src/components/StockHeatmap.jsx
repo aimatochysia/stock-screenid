@@ -30,9 +30,28 @@ export default function StockHeatmap({ data = [], metric = 'priceVsSMA50Pct' }) 
     );
     
     // Sort by market cap descending for treemap algorithm
-    return filtered
-      .sort((a, b) => (b.marketCap || 0) - (a.marketCap || 0))
-      .slice(0, 50); // Show top 50 stocks
+    const sorted = filtered.sort((a, b) => (b.marketCap || 0) - (a.marketCap || 0));
+    
+    // Calculate total market cap of all stocks
+    const totalMarketCap = sorted.reduce((sum, stock) => sum + (stock.marketCap || 0), 0);
+    
+    // Include stocks until we reach 80% of total market cap
+    const targetMarketCap = totalMarketCap * 0.8;
+    let cumulativeMarketCap = 0;
+    const result = [];
+    
+    for (const stock of sorted) {
+      result.push(stock);
+      cumulativeMarketCap += stock.marketCap || 0;
+      
+      // Stop when we've reached 80% of total market cap
+      if (cumulativeMarketCap >= targetMarketCap) {
+        break;
+      }
+    }
+    
+    // Return at least the top stocks if we have them, or all if less than target
+    return result.length > 0 ? result : sorted;
   }, [data, metric]);
 
   const { minValue, maxValue } = useMemo(() => {
