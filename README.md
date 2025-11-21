@@ -1,5 +1,5 @@
 # Stock Screener Dashboard
-[Visit Me!](https://screenid.vercel.app)
+# [Visit Me!](https://screenid.vercel.app)
 
 A modern, feature-rich stock screening dashboard built with React, Vite, and TailwindCSS. Track market performance, analyze technical indicators, and export data for deeper analysis.
 
@@ -87,17 +87,6 @@ Data is fetched from:
 
 The app includes 12-hour caching and mock data fallback for offline development.
 
-## 🎨 Features Showcase
-
-### Light Mode
-![Light Mode](https://github.com/user-attachments/assets/ab64e650-5481-44ae-bfa7-e644113b8cd1)
-
-### Dark Mode
-![Dark Mode](https://github.com/user-attachments/assets/6522bc5f-fffd-41b8-9b27-a3e036cde8e0)
-
-### Landing Page
-![Landing Page](https://github.com/user-attachments/assets/e7d2de87-03da-40a8-aaea-5defd2ef0af8)
-
 ## 🔧 Development
 
 ### Project Structure
@@ -137,8 +126,7 @@ All code passes:
 - ✅ CodeQL security scan (zero vulnerabilities)
 
 ## 📝 License
-
-MIT
+CC BY 4.0 and CC BY-SA 4.0
 
 ## 🙏 Acknowledgments
 
