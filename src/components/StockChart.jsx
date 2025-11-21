@@ -2,12 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { createChart, ColorType, CandlestickSeries, LineSeries, HistogramSeries } from 'lightweight-charts';
 import { useTheme } from '../contexts/ThemeContext';
 
-/**
- * StockChart component displays a candlestick chart with volume and moving averages
- * @param {Object} props
- * @param {Array} props.data - Daily OHLCV data [{date, open, high, low, close, volume}, ...]
- * @param {string} props.ticker - Stock ticker symbol
- */
+
 export default function StockChart({ data, ticker }) {
   const { isDark } = useTheme();
   const chartContainerRef = useRef(null);
@@ -27,12 +22,12 @@ export default function StockChart({ data, ticker }) {
   const [showVolume, setShowVolume] = useState(true);
   const [showSettings, setShowSettings] = useState(false);
 
-  // Calculate moving average
+  
   const calculateMA = (data, period) => {
     const result = [];
     for (let i = 0; i < data.length; i++) {
       if (i < period - 1) {
-        // Skip entries until we have enough data points
+        
         continue;
       }
       let sum = 0;
@@ -44,24 +39,24 @@ export default function StockChart({ data, ticker }) {
     return result;
   };
 
-  // Initialize chart
+  
   useEffect(() => {
     if (!chartContainerRef.current || !data || data.length === 0) return;
 
-    // Clear existing chart
+    
     if (chartRef.current) {
       chartRef.current.remove();
-      // Clear series references since chart is removed
+      
       candlestickSeriesRef.current = null;
       volumeSeriesRef.current = null;
       maSeriesRefs.current = {};
     }
 
-    // Get container dimensions
+    
     const containerWidth = chartContainerRef.current.clientWidth;
-    const containerHeight = 600; // Fixed height
+    const containerHeight = 600; 
 
-    // Create chart
+    
     const chart = createChart(chartContainerRef.current, {
       width: containerWidth,
       height: containerHeight,
@@ -74,7 +69,7 @@ export default function StockChart({ data, ticker }) {
         horzLines: { color: isDark ? '#374151' : '#e5e7eb' },
       },
       crosshair: {
-        mode: 1, // CrosshairMode.Normal
+        mode: 1, 
       },
       rightPriceScale: {
         borderColor: isDark ? '#4b5563' : '#d1d5db',
@@ -88,7 +83,7 @@ export default function StockChart({ data, ticker }) {
 
     chartRef.current = chart;
 
-    // Add candlestick series
+    
     const candlestickSeriesInst = chart.addSeries(CandlestickSeries, {
       upColor: '#089981',
       downColor: '#F23645',
@@ -98,7 +93,7 @@ export default function StockChart({ data, ticker }) {
     });
     candlestickSeriesRef.current = candlestickSeriesInst;
 
-    // Prepare candlestick data
+    
     const candleData = data.map(item => ({
       time: item.date,
       open: item.open,
@@ -108,7 +103,7 @@ export default function StockChart({ data, ticker }) {
     }));
     candlestickSeriesInst.setData(candleData);
 
-    // Add volume series in a separate pane (if enabled)
+    
     if (showVolume) {
       const volumeSeriesInst = chart.addSeries(HistogramSeries, {
         color: '#26a69a',
@@ -123,7 +118,7 @@ export default function StockChart({ data, ticker }) {
       });
       volumeSeriesRef.current = volumeSeriesInst;
 
-      // Prepare volume data
+      
       const volumeData = data.map(item => ({
         time: item.date,
         value: item.volume,
@@ -132,13 +127,13 @@ export default function StockChart({ data, ticker }) {
       volumeSeriesInst.setData(volumeData);
     }
 
-    // Add moving averages
+    
     const maData = data.map(item => ({
       time: item.date,
       close: item.close,
     }));
 
-    // Add enabled MA series (no need to clear since we already reset maSeriesRefs)
+    
     Object.entries(maSettings).forEach(([key, settings]) => {
       if (settings.enabled) {
         const period = parseInt(key.replace('ma', ''));
@@ -153,10 +148,10 @@ export default function StockChart({ data, ticker }) {
       }
     });
 
-    // Fit content
+    
     chart.timeScale().fitContent();
 
-    // Handle resize
+    
     const handleResize = () => {
       if (chartContainerRef.current && chartRef.current) {
         const newWidth = chartContainerRef.current.clientWidth;
@@ -202,7 +197,6 @@ export default function StockChart({ data, ticker }) {
 
   return (
     <div className={`rounded-lg p-4 ${isDark ? 'bg-gray-800' : 'bg-white'}`}>
-      {/* Header */}
       <div className="flex justify-between items-center mb-4">
         <h3 className={`text-xl font-bold ${isDark ? 'text-gray-200' : 'text-gray-800'}`}>
           {ticker} - Candlestick Chart
@@ -217,14 +211,12 @@ export default function StockChart({ data, ticker }) {
         </button>
       </div>
 
-      {/* Settings Panel */}
       {showSettings && (
         <div className={`mb-4 p-4 rounded-lg border ${isDark ? 'bg-gray-700 border-gray-600' : 'bg-gray-50 border-gray-200'}`}>
           <h4 className={`text-sm font-semibold mb-3 ${isDark ? 'text-gray-200' : 'text-gray-800'}`}>
             Chart Options
           </h4>
           
-          {/* Volume Toggle */}
           <div className="mb-4">
             <label className="flex items-center gap-2 cursor-pointer">
               <input
@@ -273,14 +265,12 @@ export default function StockChart({ data, ticker }) {
         </div>
       )}
 
-      {/* Chart Container */}
       <div 
         ref={chartContainerRef} 
         className={`rounded-lg overflow-auto border ${isDark ? 'border-gray-700' : 'border-gray-200'}`}
         style={{ width: '100%', height: 'auto' }}
       />
       
-      {/* Info */}
       <div className={`mt-4 text-xs ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
         <p>💡 Tips: Scroll to zoom, drag to pan, crosshair shows values on hover</p>
       </div>

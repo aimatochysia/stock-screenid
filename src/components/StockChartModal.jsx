@@ -3,13 +3,7 @@ import { useTheme } from '../contexts/ThemeContext';
 import StockChart from './StockChart';
 import { getDailyData } from '../api/dailyApi';
 
-/**
- * StockChartModal displays a modal with stock chart
- * @param {Object} props
- * @param {string} props.ticker - Stock ticker symbol
- * @param {string} props.db - Database name for fetching data
- * @param {Function} props.onClose - Close handler
- */
+
 export default function StockChartModal({ ticker, db, onClose }) {
   const { isDark } = useTheme();
   const [loading, setLoading] = useState(true);
@@ -35,7 +29,7 @@ export default function StockChartModal({ ticker, db, onClose }) {
     fetchData();
   }, [ticker, db]);
 
-  // Handle escape key
+  
   useEffect(() => {
     const handleEscape = (e) => {
       if (e.key === 'Escape') {
@@ -58,7 +52,6 @@ export default function StockChartModal({ ticker, db, onClose }) {
         }`}
         onClick={(e) => e.stopPropagation()}
       >
-        {/* Close button */}
         <button
           onClick={onClose}
           className={`absolute top-4 right-4 z-10 px-3 py-1 rounded-lg transition-colors ${
@@ -68,7 +61,6 @@ export default function StockChartModal({ ticker, db, onClose }) {
           ✕ Close
         </button>
 
-        {/* Content */}
         <div className="p-6">
           {loading && (
             <div className="flex flex-col items-center justify-center py-20">

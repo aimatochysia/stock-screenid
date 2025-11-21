@@ -8,10 +8,8 @@ export default function LandingPage() {
 
   return (
     <div className={`min-h-screen ${isDark ? 'bg-gradient-to-br from-gray-900 via-blue-900 to-purple-900' : 'bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50'} transition-colors duration-300`}>
-      {/* Hero Section */}
       <div className="container mx-auto px-4 py-20">
         <div className="text-center animate-fade-in">
-          {/* Main Title */}
           <h1 className={`text-6xl md:text-7xl font-bold mb-6 ${isDark ? 'text-white' : 'bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-transparent'}`}>
             Stock Screener
           </h1>
@@ -19,12 +17,10 @@ export default function LandingPage() {
             Dashboard
           </h2>
           
-          {/* Subtitle */}
           <p className={`text-xl md:text-2xl mb-12 max-w-3xl mx-auto ${isDark ? 'text-gray-300' : 'text-gray-600'}`}>
             Real-time market insights with advanced analytics, comprehensive technical indicators, and intuitive visualizations
           </p>
 
-          {/* CTA Button */}
           <button
             onClick={() => navigate('/dashboard')}
             className={`group relative px-10 py-5 text-xl font-bold rounded-2xl transition-all duration-300 transform hover:scale-105 shadow-2xl ${
@@ -38,7 +34,6 @@ export default function LandingPage() {
           </button>
         </div>
 
-        {/* Features Grid */}
         <div className="grid md:grid-cols-3 gap-8 mt-24 animate-slide-up">
           <FeatureCard
             icon="📊"
@@ -78,7 +73,6 @@ export default function LandingPage() {
           />
         </div>
 
-        {/* Stats Section */}
         <div className="mt-24 grid md:grid-cols-4 gap-6 animate-slide-up">
           <StatCard value="50+" label="Stocks Tracked" isDark={isDark} />
           <StatCard value="15+" label="Technical Indicators" isDark={isDark} />
@@ -87,7 +81,6 @@ export default function LandingPage() {
         </div>
       </div>
 
-      {/* Footer */}
       <div className={`text-center py-8 ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
         <p className="text-sm">Built with React, Vite, and TailwindCSS</p>
       </div>

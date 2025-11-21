@@ -7,7 +7,7 @@ import { useStockData } from '../hooks/useStockData';
 import { useTheme } from '../contexts/ThemeContext';
 import { downloadCSV, downloadLatestDataCSV } from '../utils/csvExport';
 
-// Column definitions - moved outside component to avoid re-creation
+
 const overviewColumns = [
   { key: 'symbol', label: 'Symbol', type: 'string' },
   { key: 'close', label: 'Close', type: 'number' },
@@ -63,10 +63,10 @@ export default function Dashboard() {
     
     setDownloading(true);
     try {
-      // Try to download from API first
+      
       await downloadLatestDataCSV();
     } catch {
-      // Fallback to current data
+      
       console.warn('Failed to fetch from API, using current data');
       if (data && data.length > 0) {
         const timestamp = new Date().toISOString().split('T')[0];
@@ -79,7 +79,7 @@ export default function Dashboard() {
     }
   };
 
-  //easy selection for column set
+  
   const columns = useMemo(() => {
     if (activeTab === 'Overview') return overviewColumns;
     if (activeTab === 'Financial') return financialColumns;
@@ -89,7 +89,7 @@ export default function Dashboard() {
   return (
     <div className={`min-h-screen transition-colors duration-300 ${isDark ? 'bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900' : 'bg-gradient-to-br from-gray-50 to-gray-100'}`}>
       <div className="p-4 sm:p-6 mx-auto animate-fade-in" style={{ maxWidth: '100rem' }}>
-        {/* Header Section */}
+
         <div className={`rounded-xl shadow-lg p-6 mb-6 transition-colors duration-300 ${isDark ? 'bg-gray-800 border border-gray-700' : 'bg-white'}`}>
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
             <div>
@@ -156,14 +156,12 @@ export default function Dashboard() {
           </div>
         </div>
 
-        {/* Summary Cards */}
         {!loading && !error && data && (
           <div className="animate-slide-up">
             <SummaryCards data={data} />
           </div>
         )}
 
-        {/* Main Content */}
         <div className={`rounded-xl shadow-lg p-6 transition-colors duration-300 ${isDark ? 'bg-gray-800 border border-gray-700' : 'bg-white'}`}>
           <Tabs tabs={tabs} active={activeTab} onChange={setActiveTab} />
           
@@ -208,7 +206,6 @@ export default function Dashboard() {
           </div>
         </div>
 
-        {/* Footer Tips */}
         <div className={`mt-6 text-xs p-4 rounded-lg shadow-sm transition-colors duration-300 ${isDark ? 'bg-gray-800 text-gray-400 border border-gray-700' : 'bg-white text-gray-500'}`}>
           <p className="font-semibold mb-2">💡 Tips:</p>
           <ul className="list-disc list-inside space-y-1">

@@ -9,7 +9,7 @@ export default function SummaryCards({ data = [] }) {
     const stocks = data.filter(s => s.close != null);
     const validPriceChanges = stocks.filter(s => s.priceVsSMA50Pct != null);
     
-    // Calculate statistics
+    
     const totalStocks = stocks.length;
     const gainers = validPriceChanges.filter(s => s.priceVsSMA50Pct > 0).length;
     const losers = validPriceChanges.filter(s => s.priceVsSMA50Pct < 0).length;

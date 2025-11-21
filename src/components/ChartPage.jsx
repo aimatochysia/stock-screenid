@@ -5,9 +5,7 @@ import StockChart from './StockChart';
 import { getDailyData } from '../api/dailyApi';
 import { getStockData } from '../api/stockApi';
 
-/**
- * ChartPage displays a full-page stock chart for a specific ticker
- */
+
 export default function ChartPage() {
   const { ticker } = useParams();
   const navigate = useNavigate();
@@ -29,7 +27,7 @@ export default function ChartPage() {
       setError(null);
       
       try {
-        // First, get stock info to find the db field
+        
         const stockList = await getStockData();
         const stock = stockList.find(s => s.symbol === ticker);
         
@@ -41,7 +39,7 @@ export default function ChartPage() {
 
         setStockInfo(stock);
 
-        // Fetch daily data
+        
         const dailyData = await getDailyData(ticker, stock.db);
         setData(dailyData);
       } catch (err) {
@@ -56,7 +54,6 @@ export default function ChartPage() {
 
   return (
     <div className={`min-h-screen ${isDark ? 'bg-gray-900' : 'bg-gray-50'} transition-colors duration-300`}>
-      {/* Header */}
       <div className={`border-b ${isDark ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} transition-colors duration-300`}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 py-4">
           <div className="flex items-center justify-between">
@@ -88,7 +85,6 @@ export default function ChartPage() {
         </div>
       </div>
 
-      {/* Main Content */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8">
         {loading && (
           <div className="flex flex-col items-center justify-center py-20">
@@ -119,7 +115,6 @@ export default function ChartPage() {
           </div>
         )}
 
-        {/* Stock Info */}
         {stockInfo && (
           <div className={`mt-6 grid grid-cols-2 md:grid-cols-4 gap-4 p-6 rounded-lg ${isDark ? 'bg-gray-800' : 'bg-white'} shadow-lg`}>
             <div>
